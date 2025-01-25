@@ -10,7 +10,6 @@ import com.olgunyilmaz.fruitninjaclone.Main;
 
 /** Launches the Android application. */
 public class AndroidLauncher extends AndroidApplication {
-    private DataSaver dataSaver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

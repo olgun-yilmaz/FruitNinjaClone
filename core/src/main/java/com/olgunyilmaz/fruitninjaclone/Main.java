@@ -34,12 +34,14 @@ public class Main extends ApplicationAdapter implements InputProcessor {
 
     int lives = 0;
     int score = 0;
+    int highScore;
     float genCounter = 0.0f;
     private final float startGenSpeed = 1.1f;
     float genSpeed = startGenSpeed;
     int maxDimension;
     private double current_time;
     private double game_over_time = -1.0f;
+    DataSaver dataSaver;
 
 
 
@@ -52,6 +54,9 @@ public class Main extends ApplicationAdapter implements InputProcessor {
         cherry = new Texture("cherry.png");
         ruby = new Texture("ruby.png");
 
+        dataSaver = new DataSaver();
+        highScore = dataSaver.getData();
+
         maxDimension = Math.max(Gdx.graphics.getHeight(),Gdx.graphics.getWidth()); //Landspace or portrait?
         Fruit.radius = maxDimension / 30f;
 
@@ -59,7 +64,7 @@ public class Main extends ApplicationAdapter implements InputProcessor {
 
         font = new BitmapFont();
         font.setColor(Color.WHITE);
-        font.getData().setScale(4);
+        font.getData().setScale(3);
 
 
     }
@@ -71,8 +76,6 @@ public class Main extends ApplicationAdapter implements InputProcessor {
 
         double newTime = TimeUtils.millis() / 1000.0;
         double frameTime = Math.min(newTime - current_time,0.3); // if bigger than 0.3
-        //System.out.println(newTime - current_time);
-        //System.out.println("frame time "+frameTime);
         float deltaTime = (float) frameTime;
         current_time = newTime;
 
@@ -86,8 +89,10 @@ public class Main extends ApplicationAdapter implements InputProcessor {
             // game mode
 
             genSpeed -= deltaTime *0.015f;
+            if (score > highScore){
+                updateHighScore();
+            }
 
-            //System.out.println("GEN SPEED : "+genSpeed);
 
             if (genCounter <= 0){
                 genCounter = genSpeed;
@@ -95,7 +100,6 @@ public class Main extends ApplicationAdapter implements InputProcessor {
             }else{
                 genCounter -= deltaTime;
             }
-            //System.out.println("GEN COUNTER : "+genCounter);
 
             for (int i = 1; i <= lives; i++){
                 batch.draw(apple,i*75f,Gdx.graphics.getHeight()-50f,apple.getWidth()/20,apple.getHeight()/20);
@@ -151,7 +155,8 @@ public class Main extends ApplicationAdapter implements InputProcessor {
             font.draw(batch,"Cut to play!",(int)(Gdx.graphics.getWidth()/2.5),Gdx.graphics.getHeight()/2);
         }
 
-        font.draw(batch,"SCORE : "+score,30,70);
+        font.draw(batch,"SCORE : "+score+"  ",(float) (Gdx.graphics.getWidth()/1.5),Gdx.graphics.getHeight()-25);
+        font.draw(batch,"HIGH SCORE : "+highScore,(float) (Gdx.graphics.getWidth()/1.25),Gdx.graphics.getHeight()-25);
         batch.end();
     }
 
@@ -178,6 +183,11 @@ public class Main extends ApplicationAdapter implements InputProcessor {
         batch.dispose();
         font.dispose();
 
+    }
+
+    private void updateHighScore(){
+        dataSaver.saveData(score);
+        highScore = score;
     }
 
     @Override
