@@ -32,6 +32,9 @@ public class Main extends ApplicationAdapter implements InputProcessor {
 
     int lives = 4;
     int score = 0;
+    float genCounter = 0.0f;
+    private final float startGenSpeed = 1.1f;
+    float genSpeed = startGenSpeed;
     int maxDimension;
     private double current_time;
     private double game_over_time = -1.0f;
@@ -66,11 +69,11 @@ public class Main extends ApplicationAdapter implements InputProcessor {
 
         double newTime = TimeUtils.millis() / 1000.0;
         double frameTime = Math.min(newTime - current_time,0.3); // if bigger than 0.3
-        System.out.println("frame time : "+frameTime);
+        System.out.println(newTime - current_time);
+        System.out.println("frame time "+frameTime);
         float deltaTime = (float) frameTime;
-        System.out.println("delta time "+deltaTime);
+        current_time = newTime;
 
-        addItem();
 
         if (lives == 0 && game_over_time == 0f){
             // game over
@@ -79,6 +82,18 @@ public class Main extends ApplicationAdapter implements InputProcessor {
 
         if (lives > 0){
             // game mode
+
+            genSpeed -= deltaTime * 0.015f;
+
+            //System.out.println("GEN SPEED : "+genSpeed);
+
+            if (genCounter <= 0){
+                genCounter = genSpeed;
+                addItem();
+            }else{
+                genCounter -= deltaTime;
+            }
+            //System.out.println("GEN COUNTER : "+genCounter);
 
             for (int i = 1; i <= lives; i++){
                 batch.draw(apple,i*75f,Gdx.graphics.getHeight()-50f,apple.getWidth()/20,apple.getHeight()/20);

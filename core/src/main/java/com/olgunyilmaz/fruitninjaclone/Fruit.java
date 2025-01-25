@@ -1,5 +1,6 @@
 package com.olgunyilmaz.fruitninjaclone;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2; // yön belirtmek ve iki tane yapıyı kullanmak
 
 public class Fruit {
@@ -34,6 +35,8 @@ public class Fruit {
     }
 
     public void update(float deltaTime){
+        velocity.y -= deltaTime * (Gdx.graphics.getHeight()*0.15f);
+        velocity.x = deltaTime * Math.signum(velocity.x) * 2f;
         pos.mulAdd(velocity,deltaTime);
     }
 
