@@ -13,6 +13,8 @@ public class Fruit {
     Vector2 pos;
     Vector2 velocity;
 
+    public boolean isLiving = true;
+
     Fruit(Vector2 pos, Vector2 velocity){
         this.pos = pos;
         this.velocity = velocity;

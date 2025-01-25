@@ -32,7 +32,7 @@ public class Main extends ApplicationAdapter implements InputProcessor {
     Random random = new Random();
     Array<Fruit> fruitArray = new Array<>();
 
-    int lives =0;
+    int lives = 0;
     int score = 0;
     float genCounter = 0.0f;
     private final float startGenSpeed = 1.1f;
@@ -53,7 +53,7 @@ public class Main extends ApplicationAdapter implements InputProcessor {
         ruby = new Texture("ruby.png");
 
         maxDimension = Math.max(Gdx.graphics.getHeight(),Gdx.graphics.getWidth()); //Landspace or portrait?
-        Fruit.radius = maxDimension / 20f;
+        Fruit.radius = maxDimension / 30f;
 
         Gdx.input.setInputProcessor(this);
 
@@ -121,6 +121,30 @@ public class Main extends ApplicationAdapter implements InputProcessor {
 
                 batch.draw(texture,fruit.getPos().x,fruit.getPos().y,Fruit.radius,Fruit.radius);
 
+            }
+
+            boolean holdLives = false;
+            Array <Fruit> toRemove = new Array<>();
+            for (Fruit fruit : fruitArray){
+                if (fruit.outOfScreen()){
+                    toRemove.add(fruit);
+
+                    if (fruit.isLiving && fruit.type == Fruit.Type.REGULAR){ // if apple
+                        lives --;
+                        holdLives = true;
+                        break;
+                    }
+                }
+            }
+
+            if (holdLives){
+                for (Fruit fruit : fruitArray){
+                    fruit.isLiving = false; // if any fruit falls off the fruit set, don't reduce the lives.
+                }
+            }
+
+            for (Fruit fruit : toRemove){
+                fruitArray.removeValue(fruit,true);
             }
 
         }else{
