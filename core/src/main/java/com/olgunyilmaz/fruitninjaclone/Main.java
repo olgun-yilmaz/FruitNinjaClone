@@ -1,5 +1,7 @@
 package com.olgunyilmaz.fruitninjaclone;
 
+import static java.lang.Math.abs;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -30,7 +32,7 @@ public class Main extends ApplicationAdapter implements InputProcessor {
     Random random = new Random();
     Array<Fruit> fruitArray = new Array<>();
 
-    int lives = 4;
+    int lives =0;
     int score = 0;
     float genCounter = 0.0f;
     private final float startGenSpeed = 1.1f;
@@ -69,8 +71,8 @@ public class Main extends ApplicationAdapter implements InputProcessor {
 
         double newTime = TimeUtils.millis() / 1000.0;
         double frameTime = Math.min(newTime - current_time,0.3); // if bigger than 0.3
-        System.out.println(newTime - current_time);
-        System.out.println("frame time "+frameTime);
+        //System.out.println(newTime - current_time);
+        //System.out.println("frame time "+frameTime);
         float deltaTime = (float) frameTime;
         current_time = newTime;
 
@@ -83,7 +85,7 @@ public class Main extends ApplicationAdapter implements InputProcessor {
         if (lives > 0){
             // game mode
 
-            genSpeed -= deltaTime * 0.015f;
+            genSpeed -= deltaTime *0.015f;
 
             //System.out.println("GEN SPEED : "+genSpeed);
 
@@ -121,17 +123,19 @@ public class Main extends ApplicationAdapter implements InputProcessor {
 
             }
 
+        }else{
+            font.draw(batch,"Cut to play!",(int)(Gdx.graphics.getWidth()/2.5),Gdx.graphics.getHeight()/2);
         }
 
-        font.draw(batch,"SCORE : 0",30,70);
-        font.draw(batch,"Cut to play!",(int)(Gdx.graphics.getWidth()/2.5),Gdx.graphics.getHeight()/2);
+        font.draw(batch,"SCORE : "+score,30,70);
         batch.end();
     }
 
     private void addItem(){
         float pos = random.nextFloat() * maxDimension;
+        float positionOffset = abs(random.nextFloat() - .5f);
         Fruit item = new Fruit(new Vector2(pos,-Fruit.radius), new Vector2(
-            (Gdx.graphics.getWidth()*.5f)+random.nextFloat(),(Gdx.graphics.getHeight()*.5f)));
+            (Gdx.graphics.getWidth()*.5f)*positionOffset,(Gdx.graphics.getHeight()*.5f)));
 
         float type = random.nextFloat();
         if (type > 0.98){ // bill ->%2
@@ -183,7 +187,54 @@ public class Main extends ApplicationAdapter implements InputProcessor {
     }
 
     @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
+    public boolean touchDragged(int screenX, int screenY, int pointer) { // cut
+        if (lives <= 0 && current_time - game_over_time > 2f){
+            // menu mode
+            game_over_time = 0f;
+            score = 0;
+            lives = 4;
+            genSpeed = startGenSpeed;
+            fruitArray.clear();
+        }else{
+            // game mode
+            Array <Fruit> toRemove = new Array<>();
+            Vector2 pos = new Vector2(screenX,Gdx.graphics.getHeight()-screenY);
+            int plus_score = 0;
+
+
+            for (Fruit fruit : fruitArray){
+                if (fruit.isClicked(pos)){
+                    toRemove.add(fruit);
+
+                    System.out.println("distance : "+pos.dst2(fruit.pos));
+                    System.out.println("distance : "+fruit.isClicked(pos));
+                    System.out.println("distance : "+Fruit.radius*Fruit.radius + 1);
+
+
+                    switch (fruit.type){
+                        case REGULAR:
+                            plus_score ++;
+                            break;
+                        case LIFE :
+                            lives ++;
+                            break;
+                        case ENEMY:
+                            lives --;
+                            break;
+                        case EXTRA:
+                            plus_score += 2;
+                            score ++;
+                            break;
+                    }
+                }
+            }
+            score += plus_score * plus_score;
+
+            for (Fruit fruit : toRemove){
+                fruitArray.removeValue(fruit,true);
+            }
+
+        }
         return false;
     }
 
