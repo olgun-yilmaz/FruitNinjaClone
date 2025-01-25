@@ -1,5 +1,7 @@
 package com.olgunyilmaz.fruitninjaclone.android;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
@@ -8,6 +10,8 @@ import com.olgunyilmaz.fruitninjaclone.Main;
 
 /** Launches the Android application. */
 public class AndroidLauncher extends AndroidApplication {
+    private DataSaver dataSaver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
